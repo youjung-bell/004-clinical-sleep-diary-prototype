@@ -131,7 +131,41 @@ function EditableTimeChip({
   );
 }
 
+function PrototypeMenu({ onSelect }: { onSelect: (screen: string) => void }) {
+  return (
+    <div
+      className="relative size-full flex flex-col items-center justify-center px-6 gap-8"
+      style={{ backgroundImage: "linear-gradient(rgb(1, 1, 1) 0%, rgb(18, 18, 26) 55%, rgb(35, 37, 50) 90%, rgb(45, 47, 62) 100%)" }}
+    >
+      <div className="text-center flex flex-col gap-2">
+        <h1 className="text-white text-[22px] font-bold">SleepThera v2.0.1</h1>
+        <p className="text-[13px] text-white/40">연장연구 대비 인터랙티브 프로토타입</p>
+      </div>
+      <div className="flex flex-col gap-3 w-full max-w-[327px]">
+        <button
+          onClick={() => onSelect("sleep-diary")}
+          className="bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.1)] rounded-2xl p-5 text-left flex flex-col gap-2 hover:bg-[rgba(255,255,255,0.1)] transition-all active:scale-[0.98]"
+        >
+          <span className="text-[10px] font-semibold text-white/40 tracking-wider">SREC-001</span>
+          <span className="text-white text-[17px] font-bold">수면 기록 Create</span>
+          <span className="text-[12px] text-white/50 leading-relaxed">수면의 질, 침대 시간, 입면지연시간, 실제 수면 시간, 중간 각성 기록</span>
+        </button>
+        <button
+          onClick={() => onSelect("access-code")}
+          className="bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.1)] rounded-2xl p-5 text-left flex flex-col gap-2 hover:bg-[rgba(255,255,255,0.1)] transition-all active:scale-[0.98]"
+        >
+          <span className="text-[10px] font-semibold text-white/40 tracking-wider">AUTH-002</span>
+          <span className="text-white text-[17px] font-bold">가입코드 입력</span>
+          <span className="text-[12px] text-white/50 leading-relaxed">액세스 코드를 입력하여 서비스에 가입</span>
+        </button>
+      </div>
+      <p className="text-[11px] text-white/20 mt-4">BELL Therapeutics · 2026</p>
+    </div>
+  );
+}
+
 export default function App() {
+  const [currentScreen, setCurrentScreen] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [sleepQuality, setSleepQuality] = useState(0);
   const [bedTimeHour, setBedTimeHour] = useState(22); // 침대에 누운 시각
@@ -237,6 +271,7 @@ export default function App() {
     setWakeCount(0);
     setWakeTotalMinutes(0);
     setWakeSubStep(-1);
+    setShowModal(true);
   };
 
   const handleFinalSubmit = () => {
@@ -307,6 +342,19 @@ export default function App() {
     // Other steps: default dark gradient
     return "linear-gradient(rgb(1, 1, 1) 0%, rgb(18, 18, 26) 55%, rgb(35, 37, 50) 90%, rgb(45, 47, 62) 100%)";
   };
+
+  if (!currentScreen) {
+    return <PrototypeMenu onSelect={setCurrentScreen} />;
+  }
+
+  if (currentScreen === "access-code") {
+    return (
+      <div className="relative size-full flex flex-col items-center justify-center" style={{ backgroundImage: "linear-gradient(rgb(1, 1, 1) 0%, rgb(18, 18, 26) 55%, rgb(35, 37, 50) 90%, rgb(45, 47, 62) 100%)" }}>
+        <p className="text-white/50 text-[14px] mb-4">가입코드 입력 프로토타입은 준비 중입니다</p>
+        <button onClick={() => setCurrentScreen(null)} className="text-white/70 text-[14px] underline">← 목차로 돌아가기</button>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -1645,11 +1693,11 @@ function SleepWakeTimeStep({
               );
             })}
 
-            {/* Trying to sleep period bar */}
+            {/* Trying to sleep period bar (SL 영역 - amber) */}
             <div
               className="absolute left-0 w-full pointer-events-none"
               style={{
-                backgroundColor: "#6A7282",
+                backgroundColor: "rgba(251, 191, 36, 0.3)",
                 top: `${Math.min(localHourToPct(sleepAttemptHour), localHourToPct(sleepTimeHour))}%`,
                 bottom: `${100 - Math.max(localHourToPct(sleepAttemptHour), localHourToPct(sleepTimeHour))}%`,
               }}
@@ -1664,11 +1712,7 @@ function SleepWakeTimeStep({
               }}
             />
 
-            {/* Sleep time stroke */}
-            <div
-              className="absolute left-0 w-full h-[2px] bg-blue-400 pointer-events-none z-40 -translate-y-1/2"
-              style={{ top: `${localHourToPct(sleepTimeHour)}%` }}
-            />
+            {/* Sleep time stroke - amber, 핸들 박스에 통합 */}
 
             {/* Sleep latency bracket + duration label */}
             {(() => {
@@ -1693,9 +1737,9 @@ function SleepWakeTimeStep({
                     }}
                   >
                     <svg className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                      <line x1="0" y1="0" x2="0" y2="100%" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
-                      <line x1="0" y1="0" x2="6" y2="0" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
-                      <line x1="0" y1="100%" x2="6" y2="100%" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+                      <line x1="0" y1="0" x2="0" y2="100%" stroke="rgba(251,191,36,0.4)" strokeWidth="1" />
+                      <line x1="0" y1="0" x2="6" y2="0" stroke="rgba(251,191,36,0.4)" strokeWidth="1" />
+                      <line x1="0" y1="100%" x2="6" y2="100%" stroke="rgba(251,191,36,0.4)" strokeWidth="1" />
                     </svg>
                   </div>
                   {/* Duration card at midpoint (left side) */}
@@ -1710,9 +1754,9 @@ function SleepWakeTimeStep({
                       transition: "transform 200ms ease-out",
                     }}
                   >
-                    <div className="bg-[#2D3748] border border-[#6A7282]/40 px-3 py-2 rounded-lg text-white whitespace-nowrap select-none flex flex-col items-start gap-1 shadow-lg min-w-[90px]">
-                      <span className="text-[10px] text-white/50 leading-none">입면지연시간</span>
-                      <span className="text-[13px] font-bold text-white/90 leading-none flex items-center gap-1.5">
+                    <div className="bg-[#2D3748] border border-amber-400/40 px-3 py-2 rounded-lg text-white whitespace-nowrap select-none flex flex-col items-start gap-1 shadow-lg min-w-[90px]">
+                      <span className="text-[10px] text-amber-400/70 leading-none">입면지연시간</span>
+                      <span className="text-[13px] font-bold text-amber-300 leading-none flex items-center gap-1.5">
                         <span>⏱️</span>
                         <span>{formatLatency(latencyMin)}</span>
                       </span>
@@ -1722,13 +1766,13 @@ function SleepWakeTimeStep({
               );
             })()}
 
-            {/* Sleep time handle (right side) - hit area 확대 */}
+            {/* Sleep time handle - amber chevron */}
             <div
-              className="absolute -translate-y-1/2 cursor-grab active:cursor-grabbing z-50 p-3"
+              className="absolute -translate-y-1/2 cursor-grab active:cursor-grabbing z-50"
               style={{
                 top: `${localHourToPct(sleepTimeHour)}%`,
-                left: "100%",
-                marginLeft: "-12px",
+                right: "-8px",
+                left: "-8px",
               }}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -1741,80 +1785,78 @@ function SleepWakeTimeStep({
                 beginHandlePress(e.touches[0].clientX, e.touches[0].clientY, "sleep", sleepTimeHour);
               }}
             >
-              <div className="flex items-center">
-                <div className="h-[2px] w-[40px] bg-blue-400" />
-                <div
-                  className="bg-[#2D3748] border-blue-400 rounded-full shadow-lg select-none"
-                  style={{
-                    width: fineMode === "sleep" ? 24 : 16,
-                    height: fineMode === "sleep" ? 24 : 16,
-                    borderWidth: fineMode === "sleep" ? 3 : 2,
-                    borderStyle: "solid",
-                    transition: "width 200ms, height 200ms, border-width 200ms",
-                  }}
-                />
+              <div className="relative flex flex-col items-center justify-center">
+                {/* amber 가로선 (중앙) */}
+                <div className="absolute left-0 right-0 h-[2px] bg-amber-400 top-1/2 -translate-y-1/2" />
+                {/* Chevron */}
+                <div className="relative flex flex-col items-center gap-[2px] py-[4px]">
+                  <svg width="24" height="10" viewBox="0 0 24 10" fill="none">
+                    <path d="M4 8L12 2L20 8" stroke="#FBBF24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <svg width="24" height="10" viewBox="0 0 24 10" fill="none">
+                    <path d="M4 2L12 8L20 2" stroke="#FBBF24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
               </div>
             </div>
 
-            {/* Wake time stroke */}
+            {/* Wake group: stroke + label + handle 함께 움직임 */}
             <div
-              className="absolute left-0 w-full h-[2px] bg-blue-400 pointer-events-none z-40 -translate-y-1/2"
+              className="absolute left-0 right-0 z-40"
               style={{ top: `${localHourToPct(wakeTimeHour)}%` }}
-            />
-
-            {/* Wake time label (left side) */}
-            <div
-              className="absolute z-40"
-              style={{
-                top: `${localHourToPct(wakeTimeHour)}%`,
-                right: "100%",
-                paddingRight: "8px",
-                transform: fineMode ? "translateY(-50%) scale(0.5)" : "translateY(-50%)",
-                transformOrigin: "right center",
-                transition: "transform 200ms ease-out",
-                maxWidth: "calc(55vw - 60px)",
-              }}
             >
-              <EditableTimeChip
-                label="잠에서 깬 시각"
-                icon="⏰"
-                hour={wakeTimeHour}
-                onChange={(h) => setWakeTimeHour(clampHourInRange(h, bedTimeHour, outOfBedHour))}
-                minWidth={100}
-              />
-            </div>
+              {/* Stroke */}
+              <div className="absolute left-0 w-full h-[2px] bg-sky-300 -translate-y-1/2 pointer-events-none" />
 
-            {/* Wake time handle (right side) - hit area 확대 */}
-            <div
-              className="absolute -translate-y-1/2 cursor-grab active:cursor-grabbing z-50 p-3"
-              style={{
-                top: `${localHourToPct(wakeTimeHour)}%`,
-                left: "100%",
-                marginLeft: "-12px",
-              }}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                beginHandlePress(e.clientX, e.clientY, "wake", wakeTimeHour);
-              }}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                beginHandlePress(e.touches[0].clientX, e.touches[0].clientY, "wake", wakeTimeHour);
-              }}
-            >
-              <div className="flex items-center">
-                <div className="h-[2px] w-[40px] bg-blue-400" />
-                <div
-                  className="bg-[#2D3748] border-blue-400 rounded-full shadow-lg select-none"
-                  style={{
-                    width: fineMode === "wake" ? 24 : 16,
-                    height: fineMode === "wake" ? 24 : 16,
-                    borderWidth: fineMode === "wake" ? 3 : 2,
-                    borderStyle: "solid",
-                    transition: "width 200ms, height 200ms, border-width 200ms",
-                  }}
+              {/* Label (left side) */}
+              <div
+                className="absolute z-40"
+                style={{
+                  right: "100%",
+                  paddingRight: "8px",
+                  transform: fineMode ? "translateY(-50%) scale(0.5)" : "translateY(-50%)",
+                  transformOrigin: "right center",
+                  transition: "transform 200ms ease-out",
+                  maxWidth: "calc(55vw - 60px)",
+                }}
+              >
+                <EditableTimeChip
+                  label="잠에서 깬 시각"
+                  icon="⏰"
+                  hour={wakeTimeHour}
+                  onChange={(h) => setWakeTimeHour(clampHourInRange(h, bedTimeHour, outOfBedHour))}
+                  minWidth={100}
                 />
+              </div>
+
+              {/* Handle (right side) */}
+              <div
+                className="absolute -translate-y-1/2 cursor-grab active:cursor-grabbing z-50 p-3"
+                style={{ left: "100%", marginLeft: "-12px" }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  beginHandlePress(e.clientX, e.clientY, "wake", wakeTimeHour);
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  beginHandlePress(e.touches[0].clientX, e.touches[0].clientY, "wake", wakeTimeHour);
+                }}
+              >
+                <div className="flex items-center">
+                  <div className="h-[2px] w-[40px] bg-sky-300" />
+                  <div
+                    className="bg-[#1a1a2e] border-sky-300 rounded-full select-none"
+                    style={{
+                      width: fineMode === "wake" ? 24 : 18,
+                      height: fineMode === "wake" ? 24 : 18,
+                      borderWidth: fineMode === "wake" ? 3 : 2.5,
+                      borderStyle: "solid",
+                      transition: "width 200ms, height 200ms, border-width 200ms",
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
