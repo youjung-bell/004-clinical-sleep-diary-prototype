@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>가입코드 입력</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Pretendard', sans-serif;
+    background: linear-gradient(180deg, #010101 0%, #12121A 55%, #232532 90%, #2D2F3E 100%);
+    min-height: 100vh;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+  }
+  .container { width: 100%; max-width: 375px; min-height: 100vh; padding: 60px 24px 40px; display: flex; flex-direction: column; position: relative; }
+  h1 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.4; }
+  .subtitle { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 36px; line-height: 1.5; }
+  .form-group { margin-bottom: 24px; }
+  .label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 10px; display: block; }
+  .label .required { color: #F87171; margin-left: 2px; }
+  .select-wrap { position: relative; }
+  .select-wrap select {
+    width: 100%; height: 52px; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 12px;
+    padding: 0 40px 0 16px; font-size: 15px; color: #fff;
+    background: rgba(255,255,255,0.05); appearance: none; -webkit-appearance: none;
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .select-wrap select:focus { border-color: rgba(255,255,255,0.4); outline: none; background: rgba(255,255,255,0.08); }
+  .select-wrap select option { background: #1a1a2e; color: #fff; }
+  .select-wrap::after { content: '▾'; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); pointer-events: none; font-size: 14px; }
+  .input-wrap { position: relative; display: flex; align-items: center; }
+  .input-wrap input {
+    flex: 1; height: 52px; border: none; border-bottom: 2px solid rgba(255,255,255,0.15);
+    border-radius: 0; padding: 0 4px; font-size: 15px; color: #fff;
+    background: transparent; transition: border-color 0.2s;
+  }
+  .input-wrap input:focus { border-bottom-color: rgba(255,255,255,0.5); outline: none; }
+  .input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
+  .input-wrap input:disabled { color: rgba(255,255,255,0.2); cursor: not-allowed; border-bottom-color: rgba(255,255,255,0.08); }
+  .input-wrap .prefix { font-size: 15px; color: rgba(255,255,255,0.5); font-weight: 500; pointer-events: none; white-space: nowrap; margin-right: 4px; transition: color 0.2s; }
+  .input-wrap .prefix.disabled { color: rgba(255,255,255,0.15); }
+  .feedback { font-size: 12px; margin-top: 8px; min-height: 16px; }
+  .feedback.error { color: #F87171; }
+  .feedback.success { color: #34D399; }
+  .input-wrap.error input { border-bottom-color: #F87171 !important; }
+  .input-wrap.success input { border-bottom-color: #34D399 !important; }
+  .spacer { flex: 1; }
+  .btn-primary { width: 100%; height: 60px; border: none; border-radius: 100px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary.active { background: rgba(255,255,255,0.9); color: #121216; }
+  .btn-primary.disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.2); pointer-events: none; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 10; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: #1a1a22; border-radius: 20px; padding: 28px 24px 20px; width: 300px; text-align: center; animation: modalIn 0.2s ease-out; border: 1px solid rgba(255,255,255,0.1); }
+  @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal h2 { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+  .modal .hospital-name { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 4px; font-weight: 500; }
+  .modal .code-display { font-size: 24px; font-weight: 700; color: #fff; margin: 16px 0; padding: 12px; background: rgba(255,255,255,0.06); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); letter-spacing: 1px; }
+  .modal p { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 20px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-actions button { flex: 1; height: 48px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
+  .modal-actions button:active { opacity: 0.7; }
+  .btn-cancel { background: rgba(255,255,255,0.1); color: #fff; }
+  .btn-confirm { background: rgba(255,255,255,0.9); color: #121216; }
+  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: #fff; padding: 12px 24px; border-radius: 100px; font-size: 14px; display: none; z-index: 20; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1); }
+  .toast.show { display: block; animation: toastIn 0.3s ease-out; }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+  #confirmGroup { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>가입코드 입력</h1>
+  <p class="subtitle">가입코드는 임상시험 스크리닝 번호와 동일합니다</p>
+  <div class="form-group">
+    <span class="label">기관 선택<span class="required">*</span></span>
+    <div class="select-wrap">
+      <select id="hospitalSelect" onchange="onHospitalChange()">
+        <option value="">기관을 선택하세요</option>
+        <option value="H01">H01 · 서울대병원</option>
+        <option value="H02">H02 · 국제성모병원</option>
+        <option value="H03">H03 · 분당차병원</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <span class="label">스크리닝 번호<span class="required">*</span></span>
+    <div class="input-wrap" id="numWrap1">
+      <span class="prefix disabled" id="prefix1">선택 - S</span>
+      <input type="text" id="numInput1" placeholder="001" disabled oninput="onNumInput()" maxlength="4" inputmode="numeric">
+    </div>
+  </div>
+  <div class="form-group" id="confirmGroup">
+    <span class="label">스크리닝 번호 재입력<span class="required">*</span></span>
+    <div class="input-wrap" id="numWrap2">
+      <span class="prefix disabled" id="prefix2">선택 - S</span>
+      <input type="text" id="numInput2" placeholder="한 번 더 입력하세요" disabled oninput="onConfirmInput()" maxlength="4" inputmode="numeric">
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-primary disabled" id="submitBtn" onclick="onSubmit()">확인</button>
+</div>
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h2>가입코드 확인</h2>
+    <div class="hospital-name" id="modalHospital">-</div>
+    <div class="code-display" id="modalCode">-</div>
+    <p>위 기관과 스크리닝 번호가 맞는지<br>확인해주세요.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">수정하기</button>
+      <button class="btn-confirm" onclick="confirmSignup()">확인</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  const hospitalSelect=document.getElementById('hospitalSelect'),prefix1=document.getElementById('prefix1'),prefix2=document.getElementById('prefix2'),numInput1=document.getElementById('numInput1'),numInput2=document.getElementById('numInput2'),numWrap2=document.getElementById('numWrap2'),feedback=document.getElementById('feedback'),submitBtn=document.getElementById('submitBtn'),modalOverlay=document.getElementById('modalOverlay'),modalCode=document.getElementById('modalCode');
+  let selectedHospital='';
+  function onHospitalChange(){selectedHospital=hospitalSelect.value;if(selectedHospital){prefix1.textContent=selectedHospital+' - S';prefix2.textContent=selectedHospital+' - S';prefix1.classList.remove('disabled');prefix2.classList.remove('disabled');numInput1.disabled=false;numInput2.disabled=false;numInput1.focus();}else{prefix1.textContent='선택 - S';prefix2.textContent='선택 - S';prefix1.classList.add('disabled');prefix2.classList.add('disabled');numInput1.disabled=true;numInput2.disabled=true;numInput1.value='';numInput2.value='';}showConfirmField();validateMatch();updateButton();}
+  function onNumInput(){numInput1.value=numInput1.value.replace(/[^0-9]/g,'');showConfirmField();validateMatch();updateButton();}
+  function showConfirmField(){const g=document.getElementById('confirmGroup');if(numInput1.value.length>=1&&selectedHospital){g.style.display='block';}else{g.style.display='none';numInput2.value='';}}
+  function onConfirmInput(){numInput2.value=numInput2.value.replace(/[^0-9]/g,'');validateMatch();updateButton();}
+  function validateMatch(){const v1=numInput1.value,v2=numInput2.value;numWrap2.classList.remove('error','success');feedback.className='feedback';feedback.textContent='';if(!v2)return;if(v1===v2){numWrap2.classList.add('success');feedback.className='feedback success';feedback.textContent='✓ 번호가 일치합니다';}else{numWrap2.classList.add('error');feedback.className='feedback error';feedback.textContent='스크리닝 번호가 일치하지 않습니다';}}
+  function updateButton(){const valid=selectedHospital&&numInput1.value.length>=1&&numInput2.value.length>=1&&numInput1.value===numInput2.value;submitBtn.className='btn-primary '+(valid?'active':'disabled');}
+  function onSubmit(){const code=selectedHospital+'-S'+numInput1.value;const names={H01:'서울대병원',H02:'국제성모병원',H03:'분당차병원'};document.getElementById('modalHospital').textContent=names[selectedHospital]||selectedHospital;modalCode.textContent=code;modalOverlay.classList.add('show');}
+  function closeModal(){modalOverlay.classList.remove('show');numInput1.focus();}
+  function closeModalOutside(e){if(e.target===modalOverlay)closeModal();}
+  function confirmSignup(){modalOverlay.classList.remove('show');showToast('✓ '+selectedHospital+'-S'+numInput1.value+' 가입 완료');setTimeout(()=>{hospitalSelect.value='';numInput1.value='';numInput2.value='';onHospitalChange();},2000);}
+  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+</script>
+</body>
+</html>

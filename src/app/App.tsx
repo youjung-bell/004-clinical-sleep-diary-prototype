@@ -349,9 +349,18 @@ export default function App() {
 
   if (currentScreen === "access-code") {
     return (
-      <div className="relative size-full flex flex-col items-center justify-center" style={{ backgroundImage: "linear-gradient(rgb(1, 1, 1) 0%, rgb(18, 18, 26) 55%, rgb(35, 37, 50) 90%, rgb(45, 47, 62) 100%)" }}>
-        <p className="text-white/50 text-[14px] mb-4">가입코드 입력 프로토타입은 준비 중입니다</p>
-        <button onClick={() => setCurrentScreen(null)} className="text-white/70 text-[14px] underline">← 목차로 돌아가기</button>
+      <div className="relative size-full flex flex-col" style={{ background: "#f5f5f5" }}>
+        <button
+          onClick={() => setCurrentScreen(null)}
+          className="absolute top-3 left-3 z-50 bg-black/60 text-white text-[12px] px-3 py-1.5 rounded-full backdrop-blur"
+        >
+          ← 목차
+        </button>
+        <iframe
+          src="/auth-002.html"
+          className="w-full flex-1 border-none"
+          title="가입코드 입력"
+        />
       </div>
     );
   }
